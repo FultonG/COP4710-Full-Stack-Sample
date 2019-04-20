@@ -1,17 +1,61 @@
 //Packages from NPM
 const express = require('express');
+const mysql = require('mysql');
+const bodyParser = require('body-parser')
+
+var connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : 'password',
+    database : 'henry'
+  });
+   
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.static("public"));
 
-// Parse request body as JSON
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
 
 app.get('/example', function(req, res){
     res.send("This was an example request");
+});
+
+app.get('/authors', function(req, res){
+    connection.query('SELECT * FROM AUTHOR', function (error, results) {
+        if (error){
+            res.status(400)
+            res.send(error)
+            throw error;
+        } 
+        res.send(results);
+      });
+})
+
+app.get('/author', function(req, res){
+    connection.query(`SELECT * FROM AUTHOR WHERE authorFirst = '${req.query.author}'`, function(error, results){
+        if(error){
+            res.status(400);
+            res.send(error);
+            throw error;
+        }
+        res.send(results);
+    })
+})
+
+app.get('/books', function (req, res) {
+    connection.query('SELECT * FROM BOOK', function (error, results) {
+        if (error) {
+            res.status(400);
+            res.send(error);
+            throw error;
+        }
+        res.send(results);
+    })
 })
 
 app.listen(PORT, () =>
