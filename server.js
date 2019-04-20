@@ -25,7 +25,7 @@ app.get('/example', function(req, res){
     res.send("This was an example request");
 });
 
-app.get('/exampleSql', function(req, res){
+app.get('/authors', function(req, res){
     connection.query('SELECT * FROM AUTHOR', function (error, results) {
         if (error){
             res.status(400)
@@ -39,6 +39,17 @@ app.get('/exampleSql', function(req, res){
 app.get('/author', function(req, res){
     connection.query(`SELECT * FROM AUTHOR WHERE authorFirst = '${req.query.author}'`, function(error, results){
         if(error){
+            res.status(400);
+            res.send(error);
+            throw error;
+        }
+        res.send(results);
+    })
+})
+
+app.get('/books', function (req, res) {
+    connection.query('SELECT * FROM BOOK', function (error, results) {
+        if (error) {
             res.status(400);
             res.send(error);
             throw error;
